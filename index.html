@@ -128,7 +128,7 @@ structure.forEach((section, si)=>{
 
     const row = document.createElement("div");
     row.className="row";
-    row.dataset.key = key; // FIX
+    row.dataset.key = key;
 
     const label = document.createElement("div");
     label.className="label";
@@ -149,7 +149,7 @@ structure.forEach((section, si)=>{
           data[key].rating = idx+1;
         }
 
-        data[key].label = item; // FIX
+        data[key].label = item;
         save();
       };
       smiley.appendChild(span);
@@ -162,7 +162,7 @@ structure.forEach((section, si)=>{
     input.oninput = ()=>{
       data[key] = data[key] || {};
       data[key].comment = input.value;
-      data[key].label = item; // FIX
+      data[key].label = item;
       save();
     };
 
@@ -192,7 +192,7 @@ function updateUI(){
 
   document.querySelectorAll(".row").forEach((row)=>{
     const spans = row.querySelectorAll("span");
-    const key = row.dataset.key; // FIX
+    const key = row.dataset.key;
 
     spans.forEach(s => s.classList.remove("active"));
 
@@ -238,10 +238,10 @@ function updateUI(){
   document.getElementById("percent").textContent = percent.toFixed(1);
   document.getElementById("grade").textContent = grade;
 
-  generateFeedback(good, mid, bad, comments); // FIX
+  generateFeedback(good, mid, bad, comments);
 }
 
-updateUI();
+// === AUSWERTUNG + FEEDBACK ===
 
 const summary = document.createElement("div");
 summary.innerHTML = `
@@ -257,6 +257,9 @@ summary.innerHTML = `
   </div>
 `;
 document.body.appendChild(summary);
+
+// WICHTIG: erst jetzt aufrufen
+updateUI();
 
 
 // Feedback (Sandwich)
@@ -287,7 +290,10 @@ function generateFeedback(good, mid, bad, comments){
     text += "Abschließend: Insgesamt noch ausbaufähig, Fokus auf grundlegende Sicherheit.";
   }
 
-  document.getElementById("feedback").value = text;
+  const feedbackEl = document.getElementById("feedback");
+  if(feedbackEl){
+    feedbackEl.value = text;
+  }
 }
   
 </script>
