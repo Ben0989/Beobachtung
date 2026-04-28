@@ -140,10 +140,17 @@ structure.forEach((section, si)=>{
       const span = document.createElement("span");
       span.textContent = s;
       span.onclick = ()=>{
-        data[key] = data[key] || {};
-        data[key].rating = idx+1;
-        save();
-      };
+  data[key] = data[key] || {};
+
+  // Toggle (abwählen möglich)
+  if(data[key].rating === idx+1){
+    delete data[key].rating;
+  } else {
+    data[key].rating = idx+1;
+  }
+
+  save();
+};
       smiley.appendChild(span);
     });
 
