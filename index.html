@@ -173,15 +173,68 @@ function save(){
 }
 
 function updateUI(){
+  let total = 0;
+  let max = 0;
+
+  let good = [];
+  let mid = [];
+  let bad = [];
+  let comments = [];
+
   document.querySelectorAll(".row").forEach((row, index)=>{
     const spans = row.querySelectorAll("span");
-    const keys = Object.keys(data);
-    keys.forEach(k=>{
-      if(data[k]?.rating){
-        spans[data[k].rating-1]?.classList.add("active");
+
+    // Schlüssel stabil bestimmen
+    const si = row.parentElement.querySelectorAll(".row").length;
+    const key = Object.keys(data)[index];
+
+    // Reset
+    spans.forEach(s => s.classList.remove("active"));
+
+    if(data[key]?.rating){
+      const rating = data[key].rating;
+
+      // NUR diese Zeile aktiv setzen
+      spans[rating-1].classList.add("active");
+
+      total += (4 - rating);
+      max += 3;
+
+      const label = row.querySelector(".label").textContent;
+      const comment = data[key]?.comment;
+
+      if(comment && comment.length > 3){
+        comments.push(comment);
       }
-    });
+
+      if(rating === 1) good.push(label);
+      if(rating === 2) mid.push(label);
+      if(rating === 3) bad.push(label);
+
+    } else {
+      max += 3;
+    }
   });
+
+  let percent = max ? (total / max) * 100 : 0;
+  let grade = "-";
+
+  if(document.getElementById("ko")?.checked){
+    grade = 6;
+  } else {
+    if(percent>=92) grade=1;
+    else if(percent>=81) grade=2;
+    else if(percent>=67) grade=3;
+    else if(percent>=50) grade=4;
+    else if(percent>=30) grade=5;
+    else grade=6;
+  }
+
+  document.getElementById("points").textContent = total;
+  document.getElementById("percent").textContent = percent.toFixed(1);
+  document.getElementById("grade").textContent = grade;
+
+  generateFeedback(good, mid, bad, comments);
 }
 
 updateUI();
@@ -262,23 +315,35 @@ updateUI = function() {
 
 
 // Feedback (Sandwich)
-function generateFeedback(good, mid, bad){
+function generateFeedback(good, mid, bad, comments){
   let text = "";
 
+  // Positiv
   if(good.length){
-    text += "Positiv: Besonders sicher und strukturiert war die Leistung bei " + good.slice(0,2).join(", ") + ". ";
+    text += "Positiv: Besonders sicher und strukturiert war die Leistung bei " 
+      + good.slice(0,2).join(", ") + ". ";
   }
 
+  // Kritik
   if(bad.length){
-    text += "Verbesserung: Deutliche Schwächen zeigten sich bei " + bad.slice(0,2).join(", ") + ". Hier besteht konkreter Trainingsbedarf. ";
+    text += "Verbesserung: Deutliche Schwächen zeigten sich bei " 
+      + bad.slice(0,2).join(", ") + ". ";
   } else if(mid.length){
-    text += "Verbesserung: Teilweise noch unsicher bei " + mid.slice(0,2).join(", ") + ". Hier sollte weiter stabilisiert werden. ";
+    text += "Verbesserung: Teilweise noch unsicher bei " 
+      + mid.slice(0,2).join(", ") + ". ";
   }
 
+  // Kommentare integrieren
+  if(comments.length){
+    text += "Beobachtungen: " + comments.slice(0,2).join(" | ") + ". ";
+  }
+
+  // Abschluss
   if(good.length){
-    text += "Abschließend: Insgesamt eine solide Grundlage, insbesondere im Bereich " + good[0] + ".";
+    text += "Abschließend: Insgesamt eine stabile Leistung mit guten Ansätzen im Bereich " 
+      + good[0] + ".";
   } else {
-    text += "Abschließend: Insgesamt noch ausbaufähig, Fokus auf grundlegende Sicherheit und Struktur legen.";
+    text += "Abschließend: Insgesamt noch ausbaufähig, Fokus auf grundlegende Sicherheit.";
   }
 
   document.getElementById("feedback").value = text;
